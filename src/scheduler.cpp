@@ -1,6 +1,6 @@
 #include <scheduler.h>
-#include <core/executionmanager.h>
-#include <core/type/static_image.h>
+#include <lms/executionmanager.h>
+#include <lms/type/static_image.h>
 #include <stdio.h>
 #include <unistd.h>
 

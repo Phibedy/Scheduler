@@ -1,11 +1,11 @@
 #ifndef IMPORTER_SCHEDULER_IMPORTER_H
 #define IMPORTER_SCHEDULER_IMPORTER_H
 
-#include <core/datamanager.h>
+#include <lms/datamanager.h>
 
-#include <core/module.h>
-#include <core/datamanager.h>
-#include <core/datamanager.h>
+#include <lms/module.h>
+#include <lms/datamanager.h>
+#include <lms/datamanager.h>
 #include <time.h>
 #include <sys/time.h>
 
