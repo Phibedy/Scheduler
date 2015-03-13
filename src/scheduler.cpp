@@ -7,24 +7,15 @@
 // TODO umbenennen, name irreführend
 
 bool Scheduler::initialize() {
+    using lms::extra::PrecisionTime;
+
     logger.debug() << "Init: scheduler";
-    /*
-     * That error has to be fixed using cmake as it will also happen to all modules
-     *
-     */
-    datamanager()->writeChannel<std::string>(this, "STRING");
 
-    lms::type::StaticImage<320,240,char> *image =
-            datamanager()->writeChannel<lms::type::StaticImage<320,240,char>>(this, "IMAGE_BLA");
+    configLooptime = PrecisionTime::fromMillis(10);
+    configWarnTolerance = PrecisionTime::fromMillis(3);
 
-    char b = (*image)(100,20);
-    image->fill(12);
+    last = PrecisionTime::now();
 
-    //lms::ConfigFile *config = datamanager()->config("scheduler");
-
-    looptime = 10.; //config->get_or_default("looptime", (double)10.);
-    warn_tolerance = 3;//config->get_or_default("warn_tolerance", (double)3.);
-    gettimeofday(&last, NULL);
 	return true;
 }
 
@@ -33,35 +24,31 @@ bool Scheduler::deinitialize() {
 }
 
 bool Scheduler::cycle () {
+    using lms::extra::PrecisionTime;
 
-    timeval now;
+    PrecisionTime delta = PrecisionTime::now() - last;
 
-    gettimeofday(&now, NULL);
+    PrecisionTime sleep = configLooptime - delta;
+    if (sleep.micros() > 0) {
+        logger.info() << "Scheduler sleeps for " << sleep <<
+                         ". Cycle rate of "<< (1.0/(delta + sleep).micros() * 1e6) << "Hz";
 
-    double delta = (now.tv_sec - last.tv_sec + 1e-6 * (now.tv_usec - last.tv_usec)) * 1e3;
+        PrecisionTime beforeSleep = PrecisionTime::now();
+        usleep(sleep.micros());
+        PrecisionTime afterSleep = PrecisionTime::now();
 
-    double sleep = looptime - delta;
-    if (sleep > 0) {
-        logger.info() << "Scheduler sleeps for " << sleep << " Cycle rate of "<< (1/(delta + sleep) * 1e3) << "Hz";
-        usleep(sleep * 1e3);
+        logger.info("sleep") << (afterSleep - beforeSleep) << ", tried " << sleep;
     }
     /// Zeitmessung Zykluszeit
-    gettimeofday(&cycleTimeEnd, NULL);
-    cycletime = (cycleTimeEnd.tv_sec - cycleTimeStart.tv_sec + 1e-6 * (cycleTimeEnd.tv_usec - cycleTimeStart.tv_usec)) * 1e3;
-    gettimeofday(&cycleTimeStart, NULL);
-    logger.info() << "Cycletime: " << cycletime;
+    PrecisionTime cycletimeMicros = lms::extra::PrecisionTime::now() - cycleTimeStart;
+    cycleTimeStart = lms::extra::PrecisionTime::now();
+    logger.info() << "Cycletime: " << cycletimeMicros << " micros";
 
     /// Zeitmessung Scheduler
-    gettimeofday(&last, NULL);
+    last = lms::extra::PrecisionTime::now();
 
-    if (delta > looptime + warn_tolerance) {
+    if (delta > configLooptime + configWarnTolerance) {
         logger.warn() << "CYCLING TOO SLOW: " << delta << " per Loop";
-        /*std::map<std::string, double> timing;
-        ExecutionManager::getTiming(timing);
-		for (auto it = timing.begin(); it != timing.end(); ++it) {
-			printf("\tModule % 25s: %fms\n", it->first.c_str(), it->second * 1e-3);
-        }*/
     }
 	return true;
 }
-

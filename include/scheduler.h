@@ -1,13 +1,9 @@
 #ifndef IMPORTER_SCHEDULER_IMPORTER_H
 #define IMPORTER_SCHEDULER_IMPORTER_H
 
-#include <lms/datamanager.h>
-
 #include <lms/module.h>
 #include <lms/datamanager.h>
-#include <lms/datamanager.h>
-#include <time.h>
-#include <sys/time.h>
+#include <lms/extra/time.h>
 
 class Scheduler : public lms::Module {
 
@@ -19,13 +15,11 @@ public:
 	bool cycle();
 
 protected:
-    double looptime;
-    double warn_tolerance;
-    double cycletime;
+    lms::extra::PrecisionTime configLooptime;
+    lms::extra::PrecisionTime configWarnTolerance;
 
-    timeval last;
-    timeval cycleTimeStart;
-    timeval cycleTimeEnd;
+    lms::extra::PrecisionTime last;
+    lms::extra::PrecisionTime cycleTimeStart;
 };
 
 #endif
