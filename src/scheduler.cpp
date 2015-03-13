@@ -40,12 +40,12 @@ bool Scheduler::cycle () {
         logger.info("sleep") << (afterSleep - beforeSleep) << ", tried " << sleep;
     }
     /// Zeitmessung Zykluszeit
-    PrecisionTime cycletimeMicros = lms::extra::PrecisionTime::now() - cycleTimeStart;
-    cycleTimeStart = lms::extra::PrecisionTime::now();
+    PrecisionTime cycletimeMicros = PrecisionTime::now() - cycleTimeStart;
+    cycleTimeStart = PrecisionTime::now();
     logger.info() << "Cycletime: " << cycletimeMicros << " micros";
 
     /// Zeitmessung Scheduler
-    last = lms::extra::PrecisionTime::now();
+    last = PrecisionTime::now();
 
     if (delta > configLooptime + configWarnTolerance) {
         logger.warn() << "CYCLING TOO SLOW: " << delta << " per Loop";
