@@ -4,8 +4,7 @@ set ( SOURCES
 )
 
 set (HEADERS 
-	"include/scheduler.h"
-	${HEADERS_SHARED}
+        "include/scheduler.h"
 )
 
 include_directories("include")
