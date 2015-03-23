@@ -1,6 +1,5 @@
 #include <scheduler.h>
 #include <lms/executionmanager.h>
-#include <lms/type/static_image.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -33,11 +32,10 @@ bool Scheduler::cycle () {
         logger.info() << "Scheduler sleeps for " << sleep <<
                          ". Cycle rate of "<< (1.0/(delta + sleep).micros() * 1e6) << "Hz";
 
-        PrecisionTime beforeSleep = PrecisionTime::now();
+        logger.time("sleep");
         usleep(sleep.micros());
-        PrecisionTime afterSleep = PrecisionTime::now();
+        logger.timeEnd("sleep");
 
-        logger.info("sleep") << (afterSleep - beforeSleep) << ", tried " << sleep;
     }
     /// Zeitmessung Zykluszeit
     PrecisionTime cycletimeMicros = PrecisionTime::now() - cycleTimeStart;
